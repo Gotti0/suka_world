@@ -1,0 +1,285 @@
+# P24 자산군 정의 — ICB 19개 슈퍼섹터 + 원자재 5개
+#
+# 결정 근거: docs/brainstorm/2026-09-22-suka-etf-p24.md
+# 가격 원천: brent_benfold/data/cybos_crosscheck.db (읽기 전용), overseas_daily_raw
+#
+# description 은 자막 조각을 자산군에 배정할 때 임베딩하는 설명문이다.
+# ICB 정의 + 슈카 방송에서 쓰일 법한 한국어 키워드 + 국내외 대표 기업을 담는다.
+# 이 파일은 T8(규칙 동결) 전에만 고칠 수 있다. 동결 후 변경하면 결과를 다시 사전 등록해야 한다.
+#
+# icb_check: DB 표기명과 ICB 슈퍼섹터의 대응이 이름만으로 확실하면 ok, 가격 상관으로 확인했으면 probed.
+#   2026-09-22 점검(2021-05 이후 주간 상관): 금융→미국 증권브로커 0.92, 제조업→중장비 0.80,
+#   기초산업→비철금속 0.85, 비순환상품서비스→음식료 0.73·소매 0.72(가장 약함).
+# roll: 선물 연결 시계열의 월물 교체 조정 필요 여부.
+# source: 생략하면 overseas_daily_raw(달러), kr_etf 면 daily_ohlcv(원화 상장 ETF).
+#
+# 주간 시점 규약: 주 t 신호는 한국시간 목요일 23:59 까지 게시된 영상만 쓰고,
+# 금요일 종가에 포지션을 잡아 다음 금요일 종가까지 보유한다(strategy/price_panel.py 참조).
+
+version: 1
+currency: USD
+assets:
+  - id: TECH
+    name: 테크놀로지
+    group: ICB
+    codes: [DJTTHE]
+    db_name: World-테크놀러지
+    icb_check: ok
+    description: >-
+      기술 업종. 반도체, 메모리, 파운드리, HBM, D램, 낸드, 시스템반도체, 반도체 장비,
+      소프트웨어, 클라우드, SaaS, 인공지능 AI, 데이터센터, 컴퓨터 하드웨어, 스마트폰, 플랫폼 기술.
+      엔비디아, TSMC, 삼성전자, SK하이닉스, 애플, 마이크로소프트, 인텔, AMD, ASML.
+
+  - id: TELECOM
+    name: 통신
+    group: ICB
+    codes: [DJTTEL]
+    db_name: World-통신
+    icb_check: ok
+    description: >-
+      통신 업종. 이동통신사, 유선·무선 통신, 5G, 요금제, 통신망, 주파수 경매, 케이블,
+      통신 장비. SK텔레콤, KT, LG유플러스, 버라이즌, AT&T, 차이나모바일, 도이치텔레콤.
+
+  - id: HEALTH
+    name: 헬스케어
+    group: ICB
+    codes: [DJTHCA]
+    db_name: TITANS HEALTHCARE INDEX
+    icb_check: ok
+    description: >-
+      헬스케어 업종. 제약, 바이오, 신약 개발, 임상시험, FDA 승인, 비만 치료제, 백신,
+      의료기기, 병원, 보험 약가, 바이오시밀러, CDMO. 삼성바이오로직스, 셀트리온,
+      일라이릴리, 노보 노디스크, 화이자, 존슨앤드존슨, 모더나.
+
+  - id: BANKS
+    name: 은행
+    group: ICB
+    codes: [DJTBAK]
+    db_name: World-은행
+    icb_check: ok
+    description: >-
+      은행 업종. 시중은행, 예대마진, 대출 금리, 예금, 가계부채, 부실채권, 뱅크런,
+      은행 파산, 지역은행, 금융지주 배당, 밸류업. KB금융, 신한지주, 하나금융, JP모건,
+      뱅크오브아메리카, 실리콘밸리은행 SVB, 크레디트스위스.
+
+  - id: FINSVC
+    name: 금융서비스
+    group: ICB
+    codes: [DJTFVS]
+    db_name: World-금융
+    icb_check: probed  # 이름만으론 불확실, 미국 업종 지수와의 주간 상관으로 대응 확인(data/p24_checks.json)
+    description: >-
+      금융서비스 업종. 증권사, 자산운용, 투자은행, 사모펀드, 거래소, 카드사, 결제,
+      핀테크, 신용평가, 브로커리지, 개인투자자 거래대금. 미래에셋, 키움증권, 골드만삭스,
+      모건스탠리, 블랙록, 비자, 마스터카드.
+
+  - id: INSUR
+    name: 보험
+    group: ICB
+    codes: [DJTINN]
+    db_name: World-보험
+    icb_check: ok
+    description: >-
+      보험 업종. 생명보험, 손해보험, 재보험, 보험료, 보험금, 실손보험, 연금보험,
+      IFRS17, 자동차보험. 삼성생명, 삼성화재, DB손해보험, 버크셔해서웨이 보험, AIG, 알리안츠.
+
+  - id: REALEST
+    name: 부동산
+    group: ICB
+    codes: [DJR]
+    db_name: 다우존스 부동산신탁
+    icb_check: ok
+    note: 미국 리츠 지수
+    description: >-
+      부동산 업종. 부동산 가격, 아파트, 집값, 전세, 월세, 상업용 부동산, 오피스 공실,
+      리츠 REITs, 부동산 PF, 주택 공급, 청약, 모기지 금리. 부동산 개발, 임대.
+
+  - id: AUTO
+    name: 자동차·부품
+    group: ICB
+    codes: [DJTATO]
+    db_name: World-자동차
+    icb_check: ok
+    description: >-
+      자동차와 부품 업종. 완성차, 전기차, 자율주행, 하이브리드, 자동차 판매, 관세,
+      타이어, 자동차 부품. 현대차, 기아, 현대모비스, 테슬라, 도요타, 폭스바겐, BYD, GM.
+
+  - id: CONSPROD
+    name: 개인·가정용품
+    group: ICB
+    codes: [DJTNCG]
+    db_name: World-비순환상품서비스
+    icb_check: probed  # 이름만으론 불확실, 미국 업종 지수와의 주간 상관으로 대응 확인(data/p24_checks.json)
+    description: >-
+      개인·가정용품 업종. 생활용품, 화장품, 명품, 의류, 패션, 스포츠웨어, 가전, 담배,
+      K뷰티, 럭셔리 브랜드. 아모레퍼시픽, LG생활건강, LVMH, 에르메스, 나이키,
+      프록터앤드갬블 P&G, 로레알.
+
+  - id: MEDIA
+    name: 미디어
+    group: ICB
+    codes: [DJTMDI]
+    db_name: World-미디어
+    icb_check: ok
+    description: >-
+      미디어 업종. 방송, 영화, 드라마, OTT, 넷플릭스, 유튜브 광고, 광고 시장, 출판,
+      엔터테인먼트, K팝, 기획사, 웹툰, 콘텐츠 제작. 하이브, SM, JYP, CJ ENM,
+      디즈니, 넷플릭스, 워너브라더스.
+
+  - id: RETAIL
+    name: 소매
+    group: ICB
+    codes: [DJTRET]
+    db_name: World-소매
+    icb_check: ok
+    description: >-
+      소매 업종. 유통, 백화점, 대형마트, 편의점, 이커머스, 온라인 쇼핑, 쿠팡, 알리익스프레스,
+      테무, 소비 경기, 할인점. 이마트, 롯데쇼핑, 아마존, 월마트, 코스트코, 타깃, 알리바바.
+
+  - id: TRAVEL
+    name: 여행·레저
+    group: ICB
+    codes: [DJTCGS]
+    db_name: World-여행레저
+    icb_check: ok
+    description: >-
+      여행과 레저 업종. 항공사, 여행, 관광, 호텔, 카지노, 크루즈, 면세점, 외식 프랜차이즈,
+      레저, 리오프닝. 대한항공, 하나투어, 파라다이스, 메리어트, 부킹홀딩스, 에어비앤비, 맥도날드, 스타벅스.
+
+  - id: FOODBEV
+    name: 음식료
+    group: ICB
+    codes: [DJTFOB]
+    db_name: World-음식료
+    icb_check: ok
+    description: >-
+      음식료 업종. 식품, 라면, 과자, 음료, 주류, 맥주, 소주, 커피 원두 가격 전가, 식품 물가,
+      K푸드 수출, 불닭. 농심, 삼양식품, CJ제일제당, 오리온, 하이트진로, 네슬레, 코카콜라, 펩시.
+
+  - id: CONSTR
+    name: 건설·자재
+    group: ICB
+    codes: [DJTCNS]
+    db_name: World-건설
+    icb_check: ok
+    description: >-
+      건설과 건자재 업종. 건설사, 해외 수주, 인프라 투자, 원전 건설, 시멘트, 건자재,
+      토목, 재건 사업, 네옴시티. 현대건설, 삼성물산, GS건설, 빈치, 캐터필러 건설.
+
+  - id: INDUST
+    name: 산업재
+    group: ICB
+    codes: [DJTIGS]
+    db_name: World-제조업
+    icb_check: probed  # 이름만으론 불확실, 미국 업종 지수와의 주간 상관으로 대응 확인(data/p24_checks.json)
+    description: >-
+      산업재 업종. 조선, 방산, 무기 수출, 항공우주, 기계, 전력기기, 변압기, 전선,
+      원전 기자재, 로봇, 물류, 해운, 철도, 공작기계. HD현대중공업, 한화오션, 한화에어로스페이스,
+      LIG넥스원, 두산에너빌리티, LS일렉트릭, 보잉, 록히드마틴, 지멘스, GE.
+
+  - id: BASICRES
+    name: 기초자원
+    group: ICB
+    codes: [DJTBAS]
+    db_name: World-기초산업
+    icb_check: probed  # 이름만으론 불확실, 미국 업종 지수와의 주간 상관으로 대응 확인(data/p24_checks.json)
+    description: >-
+      기초자원 업종. 철강, 광업, 광산, 철광석, 비철금속 제련, 리튬 광산, 희토류, 제지,
+      중국 철강 감산. 포스코홀딩스, 고려아연, 현대제철, BHP, 리오틴토, 발레.
+
+  - id: CHEM
+    name: 화학
+    group: ICB
+    codes: [DJTCHE]
+    db_name: World-화학제품
+    icb_check: ok
+    description: >-
+      화학 업종. 석유화학, 정밀화학, 에틸렌 스프레드, 배터리 소재, 양극재, 2차전지 소재,
+      비료, 산업용 가스, 중국 증설 공급과잉. LG화학, 롯데케미칼, 에코프로, 포스코퓨처엠,
+      바스프, 다우, 린데.
+
+  - id: ENERGY
+    name: 에너지
+    group: ICB
+    codes: [DJTENG]
+    db_name: World-석유가스
+    icb_check: ok
+    description: >-
+      에너지 기업 업종. 석유 메이저, 정유사, 정제마진, 셰일 기업, 가스전 개발, 해상 시추,
+      재생에너지 기업, 태양광 기업. SK이노베이션, S-Oil, 엑슨모빌, 셰브론, 쉘, 사우디 아람코.
+
+  - id: UTIL
+    name: 유틸리티
+    group: ICB
+    codes: [.DJU]
+    db_name: 다우존스 유틸리티
+    icb_check: ok
+    note: 미국 지수
+    description: >-
+      유틸리티 업종. 전력 회사, 전기요금, 가스 공급, 수도, 발전소, 원전 운영, 전력 수요,
+      데이터센터 전력, 송전망. 한국전력, 한국가스공사, 넥스트에라에너지, 듀크에너지.
+
+  - id: OIL
+    name: 원유
+    group: COMMODITY
+    codes: [A261220]
+    source: kr_etf
+    db_name: KODEX WTI원유선물(H)
+    raw_code: CM@PWTI
+    roll: handled_by_etf
+    note: >-
+      원시 근월 연결 시계열(CM@PWTI)은 월물 교체 손익이 빠져 2021-05 이후 누적 +57% 로,
+      선물 ETF(+193%)와 크게 어긋나 ETF 로 대체했다(2026-09-22 T3). 원화·환헤지·운용보수 포함.
+    description: >-
+      원유 가격. 국제유가, WTI, 브렌트유, 두바이유, OPEC 감산, 사우디, 러시아 원유 제재,
+      산유국, 휘발유 가격, 유가 급등, 유가 폭락, 중동 전쟁과 호르무즈 해협.
+
+  - id: GOLD
+    name: 금
+    group: COMMODITY
+    codes: [GOLDLNPM]
+    db_name: 금-London
+    roll: none
+    description: >-
+      금 가격. 금값, 안전자산, 금 사상 최고가, 중앙은행 금 매입, 골드바, 금 투자,
+      달러 약세와 금, 인플레이션 헤지, 은 가격.
+
+  - id: COPPER
+    name: 구리
+    group: COMMODITY
+    codes: [CM@MCD]
+    db_name: 구리-LME
+    roll: check
+    description: >-
+      구리와 산업금속 가격. 닥터 코퍼, 구리 가격, 전력망 수요, 전기차 구리, 알루미늄,
+      니켈, 아연, LME, 중국 경기와 원자재 수요.
+
+  - id: GRAINS
+    name: 곡물
+    group: COMMODITY
+    codes: [A271060]
+    source: kr_etf
+    db_name: KODEX 3대농산물선물(H)
+    raw_code: [CM@CCRN, CM@CSBS, CM@CWHT]
+    roll: handled_by_etf
+    note: >-
+      원시 연결 시계열 동일가중 바구니는 2021-05 이후 누적 -2%, 선물 ETF 는 -21% 로 콘탱고 손실이
+      빠져 있어 ETF 로 대체했다(2026-09-22 T3). 옥수수·대두·밀 구성, 원화·환헤지·운용보수 포함.
+    description: >-
+      곡물과 식량 가격. 밀 가격, 옥수수, 대두, 콩, 쌀, 식량 위기, 우크라이나 곡물 수출,
+      흉작, 가뭄, 엘니뇨, 애그플레이션, 사료 가격.
+
+  - id: MEMORY
+    name: 메모리
+    group: COMMODITY
+    codes: ["95079"]
+    db_name: DRAM Exchange Index
+    roll: none
+    description: >-
+      메모리 반도체 가격. D램 현물가, 낸드 가격, 메모리 가격 반등, 메모리 다운사이클,
+      재고 조정, 감산, 고정거래가격, DRAMeXchange, 메모리 슈퍼사이클.
+
+appendix:
+  - id: SOX
+    name: 필라델피아 반도체 (부록, 성과 비교 제외)
+    codes: [SOX]

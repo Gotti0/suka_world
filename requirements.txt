@@ -1,0 +1,16 @@
+youtube-transcript-api
+google-genai
+voyageai
+langchain
+pydantic
+pandas
+numpy
+scipy
+scikit-learn
+xgboost
+vectorbt
+quantstats
+matplotlib
+seaborn
+jupyterlab
+python-dotenv

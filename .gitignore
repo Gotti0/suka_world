@@ -1,0 +1,15 @@
+# 비밀정보
+.env
+docs/03_Data_Pipeline/temp_cookies.md
+
+# 환경과 캐시
+.venv/
+__pycache__/
+*.pyc
+
+# 데이터(대용량·재생성 가능·수집물)
+data/
+docs/04_Assets/
+
+# WORKLOG 생성물은 추적하지 않는다(원본은 docs/worklog/entries/)
+docs/WORKLOG.md
