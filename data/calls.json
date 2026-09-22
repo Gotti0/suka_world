@@ -1,0 +1,136 @@
+{
+  "top_5_best_calls": [
+    {
+      "entry_date": "2025-11-07",
+      "exit_date": "2025-11-14",
+      "asset_id": "MEMORY",
+      "weekly_return_pct": 15.51,
+      "weight_pct": 50.1,
+      "pnl_contribution_pct": 7.77,
+      "video_title": "개인투자자 수 약 570만 명, 국민주식 삼성전자의 하락",
+      "video_url": "https://www.youtube.com/watch?v=AoucusmMFx8",
+      "quote": "한마디로 전세계에서 메모리반도체 상대 장인 3년 문자 하이닉스 마이크론 나빠지고 있다고 보면 되는데",
+      "confidence": 0.95,
+      "analysis": "정방향 매수 성공"
+    },
+    {
+      "entry_date": "2025-10-31",
+      "exit_date": "2025-11-07",
+      "asset_id": "MEMORY",
+      "weekly_return_pct": 30.23,
+      "weight_pct": 24.34,
+      "pnl_contribution_pct": 7.36,
+      "video_title": "개인투자자 수 약 570만 명, 국민주식 삼성전자의 하락",
+      "video_url": "https://www.youtube.com/watch?v=AoucusmMFx8",
+      "quote": "한마디로 전세계에서 메모리반도체 상대 장인 3년 문자 하이닉스 마이크론 나빠지고 있다고 보면 되는데",
+      "confidence": 0.95,
+      "analysis": "정방향 매수 성공"
+    },
+    {
+      "entry_date": "2025-11-21",
+      "exit_date": "2025-11-28",
+      "asset_id": "MEMORY",
+      "weekly_return_pct": 9.41,
+      "weight_pct": 61.08,
+      "pnl_contribution_pct": 5.75,
+      "video_title": "개인투자자 수 약 570만 명, 국민주식 삼성전자의 하락",
+      "video_url": "https://www.youtube.com/watch?v=AoucusmMFx8",
+      "quote": "한마디로 전세계에서 메모리반도체 상대 장인 3년 문자 하이닉스 마이크론 나빠지고 있다고 보면 되는데",
+      "confidence": 0.95,
+      "analysis": "정방향 매수 성공"
+    },
+    {
+      "entry_date": "2025-10-24",
+      "exit_date": "2025-10-31",
+      "asset_id": "MEMORY",
+      "weekly_return_pct": 22.26,
+      "weight_pct": 24.98,
+      "pnl_contribution_pct": 5.56,
+      "video_title": "개인투자자 수 약 570만 명, 국민주식 삼성전자의 하락",
+      "video_url": "https://www.youtube.com/watch?v=AoucusmMFx8",
+      "quote": "한마디로 전세계에서 메모리반도체 상대 장인 3년 문자 하이닉스 마이크론 나빠지고 있다고 보면 되는데",
+      "confidence": 0.95,
+      "analysis": "정방향 매수 성공"
+    },
+    {
+      "entry_date": "2025-10-17",
+      "exit_date": "2025-10-24",
+      "asset_id": "MEMORY",
+      "weekly_return_pct": 18.84,
+      "weight_pct": 28.28,
+      "pnl_contribution_pct": 5.33,
+      "video_title": "개인투자자 수 약 570만 명, 국민주식 삼성전자의 하락",
+      "video_url": "https://www.youtube.com/watch?v=AoucusmMFx8",
+      "quote": "한마디로 전세계에서 메모리반도체 상대 장인 3년 문자 하이닉스 마이크론 나빠지고 있다고 보면 되는데",
+      "confidence": 0.95,
+      "analysis": "정방향 매수 성공"
+    }
+  ],
+  "top_5_worst_calls": [
+    {
+      "entry_date": "2022-06-17",
+      "exit_date": "2022-06-24",
+      "asset_id": "GRAINS",
+      "weekly_return_pct": -11.24,
+      "weight_pct": 21.81,
+      "pnl_contribution_pct": -2.45,
+      "video_title": "가뭄, 전쟁, 유가폭등, 총체적 난국의 밥상 물가",
+      "video_url": "https://www.youtube.com/watch?v=DbK_j3tWHf4",
+      "quote": "러시아 같은 경우도 서방이 경제 제재를 하니까 3월 14일날 주요 곡물 수출 중단을 선언했어요",
+      "confidence": 0.95,
+      "analysis": "매수 후 급락"
+    },
+    {
+      "entry_date": "2023-11-24",
+      "exit_date": "2023-12-01",
+      "asset_id": "REALEST",
+      "weekly_return_pct": 4.92,
+      "weight_pct": -52.24,
+      "pnl_contribution_pct": -2.57,
+      "video_title": "연이어 등장하는 서울시 초고층 빌딩 개발 계획",
+      "video_url": "https://www.youtube.com/watch?v=gDy25xuYNJ0",
+      "quote": "한마디로 공급을 늘리겠다는 소리고 이거에 대단히x2 서울시가 꽂혀있다는 느낌이 들었어요",
+      "confidence": 0.95,
+      "analysis": "숏 후 급등"
+    },
+    {
+      "entry_date": "2022-08-05",
+      "exit_date": "2022-08-12",
+      "asset_id": "REALEST",
+      "weekly_return_pct": 4.4,
+      "weight_pct": -64.74,
+      "pnl_contribution_pct": -2.85,
+      "video_title": "코스피 3,000붕괴 강한자와 약한자",
+      "video_url": "https://www.youtube.com/watch?v=GiDKqhUiGi4",
+      "quote": "아직도 거래 절반이 신고 까 랍니다 부동산이 와 코스피는 조정을 받았지만 부동산은 조정을 받을 때 아무도 메모를 안 내기 때문에 효과가 없죠",
+      "confidence": 0.9,
+      "analysis": "숏 후 급등"
+    },
+    {
+      "entry_date": "2022-09-02",
+      "exit_date": "2022-09-09",
+      "asset_id": "REALEST",
+      "weekly_return_pct": 4.1,
+      "weight_pct": -70.96,
+      "pnl_contribution_pct": -2.91,
+      "video_title": "살벌한 중앙은행 총재의 경고",
+      "video_url": "https://www.youtube.com/watch?v=bQwgqIaj9hU",
+      "quote": "부동산 가격 하락이에요 하락우려죠 지금 주간으로 0.14% 빠졌다고 그러는데 이 정도 하락도 10년 내 최대",
+      "confidence": 0.95,
+      "analysis": "숏 후 급등"
+    },
+    {
+      "entry_date": "2021-12-31",
+      "exit_date": "2022-01-07",
+      "asset_id": "HEALTH",
+      "weekly_return_pct": -3.35,
+      "weight_pct": 87.06,
+      "pnl_contribution_pct": -2.91,
+      "video_title": "인류의 비만과 기술의 발전 / 프랑스의 달콤한 복수",
+      "video_url": "https://www.youtube.com/watch?v=lkM8T6Zw9OA",
+      "quote": "만약에 정말 비만치료제 시대가 열리면 뭐 어떤게 바뀔까 라는 생각을 많이 하죠",
+      "confidence": 0.9,
+      "analysis": "매수 후 급락"
+    }
+  ]
+}

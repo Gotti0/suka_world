@@ -1,0 +1,163 @@
+{
+  "sample_period": {
+    "start": "2021-04-30",
+    "end": "2026-09-11",
+    "total_weeks": 280
+  },
+  "strategy_metrics": {
+    "ret_base_L4": {
+      "cumulative_return": 0.1767,
+      "cagr": 0.0307,
+      "annualized_volatility": 0.0651,
+      "sharpe_ratio": 0.4968,
+      "max_drawdown": -0.1556,
+      "calmar_ratio": 0.1972,
+      "win_rate": 0.5393,
+      "profit_factor": 1.2199,
+      "information_ratio": -0.547
+    },
+    "ret_inv_L4": {
+      "cumulative_return": -0.1694,
+      "cagr": -0.0339,
+      "annualized_volatility": 0.0651,
+      "sharpe_ratio": -0.4968,
+      "max_drawdown": -0.2799,
+      "calmar_ratio": -0.121,
+      "win_rate": 0.4107,
+      "profit_factor": 0.8198,
+      "information_ratio": -1.1012
+    },
+    "ret_long_only_L4": {
+      "cumulative_return": 0.3164,
+      "cagr": 0.0524,
+      "annualized_volatility": 0.139,
+      "sharpe_ratio": 0.4372,
+      "max_drawdown": -0.3859,
+      "calmar_ratio": 0.1357,
+      "win_rate": 0.5214,
+      "profit_factor": 1.1791,
+      "information_ratio": -0.6884
+    },
+    "ret_base_L1": {
+      "cumulative_return": 0.1408,
+      "cagr": 0.0248,
+      "annualized_volatility": 0.1068,
+      "sharpe_ratio": 0.2824,
+      "max_drawdown": -0.3381,
+      "calmar_ratio": 0.0732,
+      "win_rate": 0.475,
+      "profit_factor": 1.1201,
+      "information_ratio": -0.466
+    },
+    "ret_delta_D4": {
+      "cumulative_return": 0.0459,
+      "cagr": 0.0084,
+      "annualized_volatility": 0.0769,
+      "sharpe_ratio": 0.1465,
+      "max_drawdown": -0.1742,
+      "calmar_ratio": 0.048,
+      "win_rate": 0.4429,
+      "profit_factor": 1.0593,
+      "information_ratio": -0.6731
+    },
+    "ret_gk_gross": {
+      "cumulative_return": 3.021,
+      "cagr": 0.2949,
+      "annualized_volatility": 0.1099,
+      "sharpe_ratio": 2.4116,
+      "max_drawdown": -0.0929,
+      "calmar_ratio": 3.1746,
+      "win_rate": 0.6179,
+      "profit_factor": 2.9495,
+      "information_ratio": 1.0124
+    },
+    "ret_gk_net": {
+      "cumulative_return": 2.4312,
+      "cagr": 0.2573,
+      "annualized_volatility": 0.1101,
+      "sharpe_ratio": 2.1374,
+      "max_drawdown": -0.1062,
+      "calmar_ratio": 2.4226,
+      "win_rate": 0.5893,
+      "profit_factor": 2.5959,
+      "information_ratio": 0.8216
+    },
+    "ret_meta_gross": {
+      "cumulative_return": -0.1597,
+      "cagr": -0.0318,
+      "annualized_volatility": 0.0436,
+      "sharpe_ratio": -0.7185,
+      "max_drawdown": -0.1997,
+      "calmar_ratio": -0.1592,
+      "win_rate": 0.4643,
+      "profit_factor": 0.7474,
+      "information_ratio": -1.0543
+    },
+    "ret_meta_net": {
+      "cumulative_return": -0.2484,
+      "cagr": -0.0516,
+      "annualized_volatility": 0.0437,
+      "sharpe_ratio": -1.1917,
+      "max_drawdown": -0.2797,
+      "calmar_ratio": -0.1846,
+      "win_rate": 0.4393,
+      "profit_factor": 0.6144,
+      "information_ratio": -1.2116
+    },
+    "ret_regime_gross": {
+      "cumulative_return": 1.688,
+      "cagr": 0.2016,
+      "annualized_volatility": 0.0882,
+      "sharpe_ratio": 2.1297,
+      "max_drawdown": -0.057,
+      "calmar_ratio": 3.5347,
+      "win_rate": 0.5929,
+      "profit_factor": 3.3066,
+      "information_ratio": 0.6015
+    },
+    "ret_regime_net": {
+      "cumulative_return": 1.4207,
+      "cagr": 0.1784,
+      "annualized_volatility": 0.0878,
+      "sharpe_ratio": 1.9154,
+      "max_drawdown": -0.0618,
+      "calmar_ratio": 2.8878,
+      "win_rate": 0.5643,
+      "profit_factor": 2.9032,
+      "information_ratio": 0.453
+    },
+    "ret_P24_EW": {
+      "cumulative_return": 0.7203,
+      "cagr": 0.106,
+      "annualized_volatility": 0.1151,
+      "sharpe_ratio": 0.9335,
+      "max_drawdown": -0.2021,
+      "calmar_ratio": 0.5244,
+      "win_rate": 0.5714,
+      "profit_factor": 1.3923,
+      "information_ratio": 0.0
+    },
+    "ret_DJGT": {
+      "cumulative_return": 1.0798,
+      "cagr": 0.1457,
+      "annualized_volatility": 0.1689,
+      "sharpe_ratio": 0.8901,
+      "max_drawdown": -0.292,
+      "calmar_ratio": 0.4988,
+      "win_rate": 0.5643,
+      "profit_factor": 1.3685,
+      "information_ratio": 0.3833
+    },
+    "ret_SOX": {
+      "cumulative_return": 2.8032,
+      "cagr": 0.2816,
+      "annualized_volatility": 0.3387,
+      "sharpe_ratio": 0.9028,
+      "max_drawdown": -0.452,
+      "calmar_ratio": 0.6229,
+      "win_rate": 0.5607,
+      "profit_factor": 1.3855,
+      "information_ratio": 0.6983
+    }
+  }
+}

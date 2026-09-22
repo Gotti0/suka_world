@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>슈카 ETF (P24) 통합 백테스트 퀀트 대시보드</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #090d16;
+            --card-bg: #131c2e;
+            --card-hover: #1e293b;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: #223048;
+            --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.2);
+            --danger: #ef4444;
+            --primary: #3b82f6;
+            --purple: #8b5cf6;
+            --cyan: #06b6d4;
+            --amber: #f59e0b;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Pretendard', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 24px;
+            line-height: 1.5;
+        }
+        .container { max-width: 1440px; margin: 0 auto; }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--border);
+        }
+        .header-title h1 {
+            font-size: 26px;
+            margin: 0 0 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-title .subtitle { color: var(--text-dim); font-size: 14px; }
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 9999px;
+            font-size: 13px;
+        }
+        .pulse-dot {
+            width: 9px;
+            height: 9px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        /* Top KPI Grid */
+        .grid-kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .kpi-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+        .kpi-card.highlight {
+            border-color: var(--accent);
+            background: linear-gradient(145deg, #132724, var(--card-bg));
+        }
+        .kpi-label {
+            font-size: 12px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .kpi-meta { font-size: 13px; color: var(--text-dim); }
+        .pos { color: var(--accent); }
+        .neg { color: var(--danger); }
+
+        /* Panels & Charts */
+        .chart-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 24px;
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .panel-title {
+            font-size: 17px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-group {
+            display: inline-flex;
+            background: #0b111e;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            gap: 4px;
+        }
+        .btn-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+        .btn-toggle.active {
+            background: var(--primary);
+            color: #fff;
+        }
+        .filter-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .filter-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .filter-pill.active {
+            color: var(--text);
+            border-color: #3b82f6;
+        }
+        .dot-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+            text-align: right;
+            white-space: nowrap;
+        }
+        th, td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: #0b111e;
+            color: var(--text-dim);
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+        th:hover { color: #fff; }
+        th:first-child, td:first-child { text-align: left; }
+        tr:hover { background: var(--card-hover); }
+        .badge-star {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-right: 6px;
+            font-weight: 600;
+        }
+
+        /* 2-Column Split */
+        .two-cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 900px) {
+            .two-cols { grid-template-columns: 1fr; }
+        }
+
+        /* Calls Grid */
+        .call-card {
+            background: #0b111e;
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+        }
+        .call-card.worst { border-left-color: var(--danger); }
+        .call-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+        }
+        .call-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .call-title a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+        .call-title a:hover { text-decoration: underline; }
+        .call-quote {
+            font-style: italic;
+            font-size: 13px;
+            color: #cbd5e1;
+            line-height: 1.4;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px 10px;
+            border-radius: 4px;
+        }
+
+        /* Signal Explorer */
+        .asset-select {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+        }
+        .asset-desc-box {
+            background: #0b111e;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #cbd5e1;
+            margin-bottom: 16px;
+        }
+        .badge-stance {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-stance.long { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .badge-stance.short { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .badge-stance.neutral { background: rgba(148, 163, 184, 0.2); color: #94a3b8; }
+        
+        .ic-banner {
+            background: #0e1e2d;
+            border-left: 4px solid var(--cyan);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #e2e8f0;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-title">
+                <h1>📈 슈카 ETF (P24) 통합 백테스트 퀀트 대시보드</h1>
+                <div class="subtitle">
+                    "슈카 말만 듣고 투자했다면 2021~2026" | 280주 시계열 분석 (2021-04-30 ~ 2026-09-11) | 18,308건 자막 및 24개 자산군
+                </div>
+            </div>
+            <div class="server-status">
+                <div class="pulse-dot"></div>
+                <span id="healthStatus">FastAPI Server Online (Port 8000)</span>
+            </div>
+        </header>
+
+        <!-- KPI Cards -->
+        <div class="grid-kpis" id="kpiGrid">
+            <div class="kpi-card highlight">
+                <div class="kpi-label"><span>GK 퀀트 앙상블 (Net 10bp)</span> <span>★ 1위</span></div>
+                <div class="kpi-value pos" id="kpiGkRet">+243.1%</div>
+                <div class="kpi-meta" id="kpiGkMeta">샤프 2.14 | MDD -10.6% | CAGR +25.7%</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label"><span>HMM 국면 게이팅 (Net)</span> <span>방어형</span></div>
+                <div class="kpi-value pos" id="kpiRegimeRet">+142.1%</div>
+                <div class="kpi-meta" id="kpiRegimeMeta">샤프 1.92 | MDD -6.2% | 칼마 2.89</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label"><span>슈카 정방향 본안 (Base L4)</span> <span>단순 롱숏</span></div>
+                <div class="kpi-value pos" id="kpiBaseRet">+17.7%</div>
+                <div class="kpi-meta" id="kpiBaseMeta">샤프 0.50 | MDD -15.6% | 승률 53.9%</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label"><span>슈카 인버스 본안 (Inv L4)</span> <span>역추종</span></div>
+                <div class="kpi-value neg" id="kpiInvRet">-16.9%</div>
+                <div class="kpi-meta" id="kpiInvMeta">샤프 -0.50 | MDD -28.0% | 승률 41.1%</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label"><span>벤치마크 (DJGT 50)</span> <span>글로벌 50</span></div>
+                <div class="kpi-value pos" id="kpiDjgtRet">+108.0%</div>
+                <div class="kpi-meta" id="kpiDjgtMeta">샤프 0.89 | MDD -29.2% | 변동성 16.9%</div>
+            </div>
+        </div>
+
+        <!-- Equity Curves & Drawdown Chart Box -->
+        <div class="chart-box">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span id="chartTitle">📊 누적 자산 가치 곡선 (Equity Curves, 2021-04-30 = 1.0)</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <div class="btn-group">
+                        <button class="btn-toggle active" id="btnModeEquity" onclick="setChartMode('equity')">누적 가치</button>
+                        <button class="btn-toggle" id="btnModeDrawdown" onclick="setChartMode('drawdown')">최대 낙폭 (Underwater)</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn-toggle active" id="btnScaleLinear" onclick="setChartScale('linear')">Linear</button>
+                        <button class="btn-toggle" id="btnScaleLog" onclick="setChartScale('logarithmic')">Log</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Series Filter Pills -->
+            <div class="filter-pills" id="seriesFilters"></div>
+
+            <div style="height: 380px; position: relative;">
+                <canvas id="equityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Strategy Summary Table -->
+        <div class="chart-box">
+            <div class="panel-header">
+                <div class="panel-title">📋 9종 전략 및 벤치마크 종합 성과 비교표</div>
+            </div>
+            <div class="table-responsive">
+                <table id="summaryTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">전략 및 벤치마크</th>
+                            <th onclick="sortTable(1)">누적 수익률</th>
+                            <th onclick="sortTable(2)">연평균(CAGR)</th>
+                            <th onclick="sortTable(3)">연변동성</th>
+                            <th onclick="sortTable(4)">샤프비율</th>
+                            <th onclick="sortTable(5)">최대낙폭(MDD)</th>
+                            <th onclick="sortTable(6)">칼마비율</th>
+                            <th onclick="sortTable(7)">주간 승률</th>
+                            <th onclick="sortTable(8)">손익비</th>
+                            <th onclick="sortTable(9)">정보비율(IR)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summaryTableBody">
+                        <tr><td colspan="10" style="text-align: center; color: var(--text-dim);">데이터 로딩 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 2-Column: P24 IC Ranking & Concept Post Calls -->
+        <div class="two-cols">
+            <!-- P24 IC Ranking Chart -->
+            <div class="chart-box">
+                <div class="panel-header">
+                    <div class="panel-title">🎯 P24 24개 자산군별 정보계수 (IC) 랭킹</div>
+                </div>
+                <div class="ic-banner">
+                    💡 <strong>역발상 퀀트 발견</strong>: 반도체·유틸은 <strong>지속성 모멘텀(+IC)</strong>을 보이는 반면, 에너지·은행·원자재는 대중 관심 정점에서 <strong>상투(-IC)</strong>를 기록하여 인버스 역방향 알파가 유효합니다.
+                </div>
+                <div style="height: 480px; position: relative;">
+                    <canvas id="icChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Concept Post Calls (Killer Content) -->
+            <div class="chart-box">
+                <div class="panel-header">
+                    <div class="panel-title">🔥 커뮤니티 개념글 킬러: Top 5 대박 vs 쪽박 픽</div>
+                </div>
+                <div class="btn-group" style="margin-bottom: 14px;">
+                    <button class="btn-toggle active" id="btnCallBest" onclick="switchCalls('best')">🏆 대박 픽 (Top 5 적중)</button>
+                    <button class="btn-toggle" id="btnCallWorst" onclick="switchCalls('worst')">💀 쪽박 픽 (Top 5 오판)</button>
+                </div>
+                <div id="callsContainer">
+                    <div style="color: var(--text-dim); text-align: center; padding: 20px;">로딩 중...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Asset Signal & Price Explorer -->
+        <div class="chart-box">
+            <div class="panel-header">
+                <div class="panel-title">🔍 자산군별 주간 신호 및 성과 탐색기 (P24 Signal Explorer)</div>
+                <div>
+                    <select class="asset-select" id="assetDropdown" onchange="onAssetChange()">
+                        <option value="">자산 선택 중...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="asset-desc-box" id="assetDescBox">
+                선택된 자산의 정의 및 산업 분류를 로딩 중입니다.
+            </div>
+
+            <div style="height: 280px; position: relative; margin-bottom: 20px;">
+                <canvas id="assetChart"></canvas>
+            </div>
+
+            <div class="panel-title" style="font-size: 15px; margin-bottom: 10px;">최근 15주 포지션 및 기여도 내역</div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>진입일 (목 마감)</th>
+                            <th>청산일 (금 종가)</th>
+                            <th>진입가 ($)</th>
+                            <th>청산가 ($)</th>
+                            <th>자산 주간수익률</th>
+                            <th>슈카 L4 점수</th>
+                            <th>스탠스 포지션</th>
+                            <th>포트폴리오 비중</th>
+                            <th>PnL 기여도</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assetHistoryBody">
+                        <tr><td colspan="9" style="text-align: center; color: var(--text-dim);">자산 데이터를 불러오는 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global State
+        let gEquityData = null;
+        let gCallsData = null;
+        let gAssetsData = [];
+        let gChartMode = 'equity'; // 'equity' or 'drawdown'
+        let gChartScale = 'linear';
+        let gEquityChart = null;
+        let gIcChart = null;
+        let gAssetChart = null;
+        let gVisibleSeries = {
+            'cum_gk_net': true,
+            'cum_regime_net': true,
+            'cum_base_L4': true,
+            'cum_inv_L4': true,
+            'cum_long_only_L4': false,
+            'cum_P24_EW': true,
+            'cum_DJGT': true,
+            'cum_SOX': false
+        };
+
+        const SERIES_META = {
+            'cum_gk_net': { label: '★ GK Alpha (Net 10bp)', color: '#10b981', width: 3 },
+            'cum_regime_net': { label: '★ Regime Gated (Net)', color: '#8b5cf6', width: 2.5 },
+            'cum_base_L4': { label: '슈카 정방향 (Base L4)', color: '#3b82f6', width: 2 },
+            'cum_inv_L4': { label: '슈카 인버스 (Inv L4)', color: '#ef4444', width: 1.5, dash: [4, 4] },
+            'cum_long_only_L4': { label: '슈카 롱온리 (Long-Only)', color: '#06b6d4', width: 1.5 },
+            'cum_P24_EW': { label: 'P24 동일가중 벤치마크', color: '#f59e0b', width: 2 },
+            'cum_DJGT': { label: 'DJ Global Titans 50', color: '#94a3b8', width: 2 },
+            'cum_SOX': { label: '필라델피아 반도체 (SOX)', color: '#ec4899', width: 1.5 }
+        };
+
+        // Global API Adapter (Supports both Dynamic FastAPI and Static GitHub Pages)
+        const IS_STATIC = window.location.protocol === 'file:' || 
+                          window.location.hostname.includes('github.io') ||
+                          (window.location.hostname === 'localhost' && window.location.port !== '8000' && window.location.port !== '8888');
+
+        async function apiFetch(endpoint) {
+            if (IS_STATIC) {
+                if (endpoint === '/api/summary') return fetch('./data/summary.json');
+                if (endpoint === '/api/equity') return fetch('./data/equity.json');
+                if (endpoint === '/api/calls') return fetch('./data/calls.json');
+                if (endpoint === '/api/assets') return fetch('./data/assets.json');
+                if (endpoint.startsWith('/api/signals/')) {
+                    const assetId = endpoint.split('/').pop();
+                    return fetch(`./data/signals/${assetId}.json`);
+                }
+                if (endpoint === '/api/health') {
+                    return {
+                        ok: true,
+                        json: async () => ({ status: 'ok', app: 'suka_dashboard_static', total_weeks: 280, assets_count: 24 })
+                    };
+                }
+            }
+            return fetch(endpoint);
+        }
+
+        // App Initialization
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchHealth();
+            await fetchSummary();
+            await fetchEquity();
+            await fetchCalls();
+            await fetchAssets();
+        });
+
+        async function fetchHealth() {
+            try {
+                const res = await apiFetch('/api/health');
+                const data = await res.json();
+                const serverName = IS_STATIC ? 'GitHub Pages (280 Weeks Live)' : `FastAPI Server Online (${data.total_weeks} Weeks Live)`;
+                document.getElementById('healthStatus').innerText = serverName;
+            } catch (e) {
+                console.error('Health check failed', e);
+                document.getElementById('healthStatus').innerText = 'API Server Disconnected';
+            }
+        }
+
+        async function fetchSummary() {
+            try {
+                const res = await apiFetch('/api/summary');
+                const data = await res.json();
+                renderSummaryTable(data.strategy_metrics);
+            } catch (e) {
+                console.error('Summary fetch failed', e);
+            }
+        }
+
+        function renderSummaryTable(metrics) {
+            const tableBody = document.getElementById('summaryTableBody');
+            tableBody.innerHTML = '';
+
+            const rowDefs = [
+                { key: 'ret_gk_net', name: '★ Grinold-Kahn 퀀트 앙상블 (Net 10bp)', isStar: true },
+                { key: 'ret_gk_gross', name: 'Grinold-Kahn 연속 알파 (Gross)', isStar: false },
+                { key: 'ret_regime_net', name: '★ HMM 국면 게이팅 (Net 10bp)', isStar: true },
+                { key: 'ret_regime_gross', name: 'HMM 국면 게이팅 (Gross)', isStar: false },
+                { key: 'ret_base_L4', name: '슈카 정방향 본안 (Base L4 롱숏)', isStar: false },
+                { key: 'ret_long_only_L4', name: '슈카 롱 온리 (Long-Only L4)', isStar: false },
+                { key: 'ret_base_L1', name: '슈카 1주 민감도 (Sensitivity L1)', isStar: false },
+                { key: 'ret_delta_D4', name: '슈카 4주 변화량 (Delta D4)', isStar: false },
+                { key: 'ret_inv_L4', name: '슈카 인버스 본안 (Inverse L4)', isStar: false },
+                { key: 'ret_P24_EW', name: '벤치마크: P24 동일가중 매수보유', isStar: false },
+                { key: 'ret_DJGT', name: '벤치마크: DJ Global Titans 50', isStar: false },
+                { key: 'ret_SOX', name: '참고: 필라델피아 반도체 지수', isStar: false }
+            ];
+
+            rowDefs.forEach(def => {
+                const m = metrics[def.key];
+                if (!m) return;
+
+                const tr = document.createElement('tr');
+                const cumPos = m.cumulative_return >= 0;
+                const mddPos = m.max_drawdown >= 0;
+
+                tr.innerHTML = `
+                    <td>${def.isStar ? '<span class="badge-star">TOP</span>' : ''}<strong>${def.name}</strong></td>
+                    <td class="${cumPos ? 'pos' : 'neg'}"><strong>${cumPos ? '+' : ''}${(m.cumulative_return * 100).toFixed(2)}%</strong></td>
+                    <td>${m.cagr >= 0 ? '+' : ''}${(m.cagr * 100).toFixed(2)}%</td>
+                    <td>${(m.annualized_volatility * 100).toFixed(2)}%</td>
+                    <td><strong>${m.sharpe_ratio >= 0 ? '+' : ''}${m.sharpe_ratio.toFixed(2)}</strong></td>
+                    <td class="neg">${(m.max_drawdown * 100).toFixed(2)}%</td>
+                    <td>${m.calmar_ratio.toFixed(2)}</td>
+                    <td>${(m.win_rate * 100).toFixed(1)}%</td>
+                    <td>${m.profit_factor.toFixed(2)}</td>
+                    <td>${m.information_ratio >= 0 ? '+' : ''}${m.information_ratio.toFixed(2)}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        async function fetchEquity() {
+            try {
+                const res = await apiFetch('/api/equity');
+                gEquityData = await res.json();
+                renderSeriesFilters();
+                renderEquityChart();
+            } catch (e) {
+                console.error('Equity fetch failed', e);
+            }
+        }
+
+        function renderSeriesFilters() {
+            const container = document.getElementById('seriesFilters');
+            container.innerHTML = '';
+
+            Object.keys(SERIES_META).forEach(key => {
+                const meta = SERIES_META[key];
+                const pill = document.createElement('div');
+                pill.className = `filter-pill ${gVisibleSeries[key] ? 'active' : ''}`;
+                pill.innerHTML = `
+                    <span class="dot-indicator" style="background: ${meta.color};"></span>
+                    <span>${meta.label}</span>
+                `;
+                pill.onclick = () => {
+                    gVisibleSeries[key] = !gVisibleSeries[key];
+                    pill.classList.toggle('active', gVisibleSeries[key]);
+                    renderEquityChart();
+                };
+                container.appendChild(pill);
+            });
+        }
+
+        function renderEquityChart() {
+            if (!gEquityData) return;
+            const ctx = document.getElementById('equityChart').getContext('2d');
+            const dates = gEquityData.dates;
+
+            const isDrawdown = (gChartMode === 'drawdown');
+            const sourceMap = isDrawdown ? gEquityData.drawdowns : gEquityData.series;
+
+            const datasets = [];
+            Object.keys(SERIES_META).forEach(key => {
+                if (!gVisibleSeries[key]) return;
+                const meta = SERIES_META[key];
+                const seriesData = sourceMap[key] || [];
+
+                datasets.push({
+                    label: meta.label,
+                    data: isDrawdown ? seriesData.map(v => v * 100) : seriesData,
+                    borderColor: meta.color,
+                    borderWidth: meta.width,
+                    borderDash: meta.dash || [],
+                    tension: 0.1,
+                    pointRadius: 0
+                });
+            });
+
+            if (gEquityChart) gEquityChart.destroy();
+
+            document.getElementById('chartTitle').innerText = isDrawdown 
+                ? '📉 최대 낙폭 곡선 (Underwater Drawdown, %)' 
+                : '📊 누적 자산 가치 곡선 (Equity Curves, 2021-04-30 = 1.0)';
+
+            gEquityChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: dates, datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#94a3b8', maxTicksLimit: 12 }
+                        },
+                        y: {
+                            type: isDrawdown ? 'linear' : gChartScale,
+                            grid: { color: '#1e293b' },
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function(val) {
+                                    return isDrawdown ? val.toFixed(1) + '%' : val.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: '#0f172a',
+                            titleColor: '#f8fafc',
+                            bodyColor: '#cbd5e1',
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const val = context.parsed.y;
+                                    if (isDrawdown) {
+                                        return `${context.dataset.label}: ${val.toFixed(2)}%`;
+                                    } else {
+                                        const retPct = ((val - 1.0) * 100).toFixed(1);
+                                        return `${context.dataset.label}: ${val.toFixed(3)} (${retPct >= 0 ? '+' : ''}${retPct}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function setChartMode(mode) {
+            gChartMode = mode;
+            document.getElementById('btnModeEquity').classList.toggle('active', mode === 'equity');
+            document.getElementById('btnModeDrawdown').classList.toggle('active', mode === 'drawdown');
+            renderEquityChart();
+        }
+
+        function setChartScale(scale) {
+            gChartScale = scale;
+            document.getElementById('btnScaleLinear').classList.toggle('active', scale === 'linear');
+            document.getElementById('btnScaleLog').classList.toggle('active', scale === 'logarithmic');
+            renderEquityChart();
+        }
+
+        async function fetchCalls() {
+            try {
+                const res = await apiFetch('/api/calls');
+                gCallsData = await res.json();
+                switchCalls('best');
+            } catch (e) {
+                console.error('Calls fetch failed', e);
+            }
+        }
+
+        function switchCalls(type) {
+            if (!gCallsData) return;
+            const container = document.getElementById('callsContainer');
+            container.innerHTML = '';
+
+            const isBest = (type === 'best');
+            document.getElementById('btnCallBest').classList.toggle('active', isBest);
+            document.getElementById('btnCallWorst').classList.toggle('active', !isBest);
+
+            const list = isBest ? gCallsData.top_5_best_calls : gCallsData.top_5_worst_calls;
+
+            list.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `call-card ${isBest ? '' : 'worst'}`;
+
+                const pnlPos = item.pnl_contribution_pct >= 0;
+                card.innerHTML = `
+                    <div class="call-meta">
+                        <span><strong>${item.entry_date} (${item.asset_id})</strong></span>
+                        <span class="${pnlPos ? 'pos' : 'neg'}">주간 ${item.weekly_return_pct >= 0 ? '+' : ''}${item.weekly_return_pct}% (PnL ${pnlPos ? '+' : ''}${item.pnl_contribution_pct}%)</span>
+                    </div>
+                    <div class="call-title">
+                        <a href="${item.video_url}" target="_blank">▶ ${item.video_title}</a>
+                    </div>
+                    <div class="call-quote">"${item.quote}"</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function fetchAssets() {
+            try {
+                const res = await apiFetch('/api/assets');
+                gAssetsData = await res.json();
+                renderIcChart();
+                renderAssetDropdown();
+            } catch (e) {
+                console.error('Assets fetch failed', e);
+            }
+        }
+
+        function renderIcChart() {
+            const ctx = document.getElementById('icChart').getContext('2d');
+            
+            // Sort assets by IC descending
+            const sorted = [...gAssetsData].sort((a, b) => b.signal_return_ic - a.signal_return_ic);
+            const labels = sorted.map(a => `${a.id} (${a.name})`);
+            const ics = sorted.map(a => a.signal_return_ic);
+            const bgColors = ics.map(ic => ic >= 0 ? 'rgba(16, 185, 129, 0.7)' : 'rgba(239, 68, 68, 0.7)');
+
+            if (gIcChart) gIcChart.destroy();
+
+            gIcChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '정보계수 (IC)',
+                        data: ics,
+                        backgroundColor: bgColors,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { color: '#cbd5e1', font: { size: 11 } }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const a = sorted[context.dataIndex];
+                                    return `IC: ${a.signal_return_ic} | 롱 ${a.long_weeks}주 | 숏 ${a.short_weeks}주`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderAssetDropdown() {
+            const dropdown = document.getElementById('assetDropdown');
+            dropdown.innerHTML = '';
+
+            gAssetsData.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a.id;
+                opt.text = `${a.id} - ${a.name} (IC: ${a.signal_return_ic >= 0 ? '+' : ''}${a.signal_return_ic})`;
+                dropdown.appendChild(opt);
+            });
+
+            // Default to MEMORY (Top performer)
+            dropdown.value = 'MEMORY';
+            onAssetChange();
+        }
+
+        async function onAssetChange() {
+            const assetId = document.getElementById('assetDropdown').value;
+            if (!assetId) return;
+
+            try {
+                const res = await apiFetch(`/api/signals/${assetId}`);
+                const data = await res.json();
+                
+                // Description box
+                document.getElementById('assetDescBox').innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 4px; color: var(--accent); font-size: 14px;">
+                        📌 [${data.asset_id}] ${data.name} (그룹: ${data.group}) | 신호-수익률 IC: <strong>${data.ic >= 0 ? '+' : ''}${data.ic}</strong>
+                    </div>
+                    <div style="margin-bottom: 6px; color: #94a3b8;">${data.description}</div>
+                    <div style="display: flex; gap: 16px; font-size: 12px; color: #e2e8f0;">
+                        <span>총 <strong>${data.summary.total_weeks}</strong>주</span>
+                        <span class="pos">매수(Long) <strong>${data.summary.long_weeks}</strong>주</span>
+                        <span class="neg">매도(Short) <strong>${data.summary.short_weeks}</strong>주</span>
+                        <span>중립(Neutral) <strong>${data.summary.neutral_weeks}</strong>주</span>
+                        <span>주간 평균수익률 <strong>${data.summary.avg_weekly_ret_pct}%</strong></span>
+                    </div>
+                `;
+
+                renderAssetChart(data);
+                renderAssetHistoryTable(data.history);
+            } catch (e) {
+                console.error('Failed to load asset details', e);
+            }
+        }
+
+        function renderAssetChart(assetData) {
+            const ctx = document.getElementById('assetChart').getContext('2d');
+            const history = assetData.history;
+            const dates = history.map(h => h.entry_date);
+            const prices = history.map(h => h.price_entry);
+            const scores = history.map(h => h.score_L4);
+
+            if (gAssetChart) gAssetChart.destroy();
+
+            gAssetChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: '가격 ($)',
+                            data: prices,
+                            borderColor: '#3b82f6',
+                            borderWidth: 2,
+                            tension: 0.1,
+                            pointRadius: 0,
+                            yAxisID: 'y'
+                        },
+                        {
+                            type: 'bar',
+                            label: '슈카 L4 발언 점수',
+                            data: scores,
+                            backgroundColor: scores.map(s => s > 0 ? 'rgba(16, 185, 129, 0.4)' : (s < 0 ? 'rgba(239, 68, 68, 0.4)' : 'transparent')),
+                            borderColor: scores.map(s => s > 0 ? '#10b981' : (s < 0 ? '#ef4444' : 'transparent')),
+                            borderWidth: 1,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#94a3b8', maxTicksLimit: 12 }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderAssetHistoryTable(history) {
+            const tbody = document.getElementById('assetHistoryBody');
+            tbody.innerHTML = '';
+
+            // Show latest 15 records
+            const recent = [...history].reverse().slice(0, 15);
+            recent.forEach(r => {
+                const tr = document.createElement('tr');
+                const retPos = r.forward_return_pct >= 0;
+                const contribPos = r.contrib_base_L4_pct >= 0;
+
+                let stanceBadge = '<span class="badge-stance neutral">중립 (0)</span>';
+                if (r.pos_base_L4 > 0) stanceBadge = '<span class="badge-stance long">롱 (+1)</span>';
+                else if (r.pos_base_L4 < 0) stanceBadge = '<span class="badge-stance short">숏 (-1)</span>';
+
+                tr.innerHTML = `
+                    <td>${r.entry_date}</td>
+                    <td>${r.exit_date}</td>
+                    <td>$${r.price_entry.toLocaleString()}</td>
+                    <td>$${r.price_exit.toLocaleString()}</td>
+                    <td class="${retPos ? 'pos' : 'neg'}">${retPos ? '+' : ''}${r.forward_return_pct}%</td>
+                    <td><strong>${r.score_L4}</strong></td>
+                    <td>${stanceBadge}</td>
+                    <td>${r.weight_base_L4_pct}%</td>
+                    <td class="${contribPos ? 'pos' : 'neg'}">${contribPos ? '+' : ''}${r.contrib_base_L4_pct}%</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Table sorting helper
+        function sortTable(colIdx) {
+            const table = document.getElementById('summaryTable');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            rows.sort((a, b) => {
+                const aText = a.children[colIdx].innerText.replace(/[^0-9.-]/g, '');
+                const bText = b.children[colIdx].innerText.replace(/[^0-9.-]/g, '');
+                const aVal = parseFloat(aText);
+                const bVal = parseFloat(bText);
+                if (!isNaN(aVal) && !isNaN(bVal)) {
+                    return bVal - aVal; // Sort desc
+                }
+                return a.children[colIdx].innerText.localeCompare(b.children[colIdx].innerText);
+            });
+
+            rows.forEach(r => tbody.appendChild(r));
+        }
+    </script>
+</body>
+</html>
