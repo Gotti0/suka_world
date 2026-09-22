@@ -93,9 +93,43 @@ def export_static_site(out_dir: Path) -> None:
     print(f"🎉 Successfully exported {total_files} files ({total_bytes / 1024:.1f} KB total)")
 
 
+def deploy_to_gh_pages(out_dir: Path, repo_url: str = "https://github.com/Gotti0/suka_world.git") -> None:
+    import subprocess
+
+    print(f"🚀 Deploying {out_dir} to gh-pages branch on {repo_url}...")
+    git_dir = out_dir / ".git"
+    if git_dir.exists():
+        shutil.rmtree(git_dir)
+
+    subprocess.run(["git", "init"], cwd=out_dir, check=True)
+    subprocess.run(["git", "checkout", "-b", "gh-pages"], cwd=out_dir, check=True)
+    subprocess.run(["git", "add", "-A"], cwd=out_dir, check=True)
+    subprocess.run(
+        ["git", "commit", "-m", "deploy: publish static dashboard on GitHub Pages"],
+        cwd=out_dir,
+        check=True,
+    )
+    subprocess.run(
+        ["git", "remote", "add", "origin", repo_url],
+        cwd=out_dir,
+        check=True,
+    )
+    subprocess.run(
+        ["git", "push", "-f", "origin", "gh-pages"],
+        cwd=out_dir,
+        check=True,
+    )
+    print("✓ Successfully pushed to origin/gh-pages")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Export static site bundle for GitHub Pages")
     parser.add_argument("--out", type=str, default="dist", help="Output directory (default: dist)")
+    parser.add_argument("--deploy", action="store_true", help="Automatically push to origin/gh-pages")
     args = parser.parse_args()
 
-    export_static_site(Path(args.out))
+    out_path = Path(args.out)
+    export_static_site(out_path)
+    if args.deploy:
+        deploy_to_gh_pages(out_path)
+
