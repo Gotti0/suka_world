@@ -1,0 +1,301 @@
+<title>슈카 P24 배정 검수</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F3F5F2; --panel:#FFFFFF; --ink:#1B2220; --muted:#5E6B67; --line:#D9DFDB;
+  --accent:#0F6E66; --accent-soft:#DDEFEC; --ok:#2E7D4F; --ok-soft:#E1F1E6; --bad:#B3413A; --bad-soft:#F6E1DE;
+  --warn:#9A6A12; --warn-soft:#F5ECD9; --null:#6B5B95; --null-soft:#ECE8F4;
+  --sans:"IBM Plex Sans KR",system-ui,-apple-system,"Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --ground:#121716; --panel:#1A2120; --ink:#E4EBE8; --muted:#95A39E; --line:#2C3634;
+  --accent:#4FB3A8; --accent-soft:#1D3431; --ok:#6CC08C; --ok-soft:#1C3325; --bad:#E27D74; --bad-soft:#3A2220;
+  --warn:#D8A64A; --warn-soft:#352C1A; --null:#A898D4; --null-soft:#2A2538;
+}}
+:root[data-theme="dark"]{
+  --ground:#121716; --panel:#1A2120; --ink:#E4EBE8; --muted:#95A39E; --line:#2C3634;
+  --accent:#4FB3A8; --accent-soft:#1D3431; --ok:#6CC08C; --ok-soft:#1C3325; --bad:#E27D74; --bad-soft:#3A2220;
+  --warn:#D8A64A; --warn-soft:#352C1A; --null:#A898D4; --null-soft:#2A2538;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:260px 1fr;gap:20px}
+@media (max-width:860px){.wrap{grid-template-columns:1fr}.rail{order:2}}
+header.top{max-width:1180px;margin:0 auto 16px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between}
+h1{font-size:22px;font-weight:600;margin:0;text-wrap:balance}
+.sub{color:var(--muted);font-size:13px;margin:2px 0 0}
+.stats{display:flex;gap:18px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.stat b{display:block;font-family:var(--mono);font-size:20px;font-weight:500}
+.stat span{font-size:12px;color:var(--muted);letter-spacing:.02em}
+.bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;max-width:1180px;margin:0 auto 18px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.rail{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;align-self:start;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+.rail h2{font-size:12px;letter-spacing:.06em;color:var(--muted);margin:0 0 8px;font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.cell{aspect-ratio:1;border-radius:4px;border:1px solid var(--line);background:transparent;font:500 10px var(--mono);color:var(--muted);cursor:pointer;padding:0}
+.cell.done-ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.cell.done-bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.cell.done-amb{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.cell.cur{outline:2px solid var(--accent);outline-offset:1px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px;border:1px solid}
+.filter{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap}
+.filter button{font:500 12px var(--sans);border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:14px;padding:3px 10px;cursor:pointer}
+.filter button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;font-size:13px;color:var(--muted)}
+.meta .n{font-family:var(--mono);color:var(--ink);font-weight:500}
+.meta .title{color:var(--ink);font-weight:500;font-size:15px;flex-basis:100%}
+.excerpt{font-size:15.5px;line-height:1.85;max-width:72ch;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;border-left:3px solid var(--line);padding-left:14px;margin:0}
+.model{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px}
+.model .lbl{color:var(--muted);letter-spacing:.02em}
+.chip{display:inline-flex;gap:6px;align-items:baseline;border-radius:14px;padding:3px 10px;border:1px solid var(--line);font-size:13px}
+.chip small{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.chip.pick{background:var(--accent-soft);border-color:var(--accent);color:var(--ink);font-weight:500}
+.chip.nullpick{background:var(--null-soft);border-color:var(--null);font-weight:500}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font:500 14px var(--sans);border-radius:8px;padding:8px 14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+.btn:focus-visible,.cell:focus-visible,.opt:focus-visible,.filter button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.btn:disabled,.opt:disabled{opacity:.4;cursor:not-allowed}
+.btn kbd{font:500 11px var(--mono);opacity:.75;margin-left:6px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opts h3{margin:0;font-size:12px;letter-spacing:.06em;color:var(--muted);font-weight:500}
+.optrow{display:flex;flex-wrap:wrap;gap:6px}
+.opt{font:13px var(--sans);border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:6px;padding:4px 10px;cursor:pointer}
+.opt[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.opt.none[aria-pressed="true"]{background:var(--null);border-color:var(--null)}
+.judged{font-size:13px;padding:8px 12px;border-radius:8px}
+.judged.ok{background:var(--ok-soft);color:var(--ok)}
+.judged.bad{background:var(--bad-soft);color:var(--bad)}
+.judged.amb{background:var(--warn-soft);color:var(--warn)}
+textarea{width:100%;min-height:52px;font:14px var(--sans);color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:8px;padding:8px 10px;resize:vertical}
+.nav{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.status{font-size:12px;color:var(--muted)}
+.help{font-size:12px;color:var(--muted);max-width:72ch}
+@media (prefers-reduced-motion: reduce){.bar i{transition:none}}
+</style>
+
+<header class="top">
+  <div>
+    <h1>슈카 P24 배정 검수</h1>
+    <p class="sub">자막 조각 100개 — 먼저 직접 자산군을 고르면, 그다음에 모델 판단이 공개됩니다. 판정은 저장소에 바로 기록됩니다.</p>
+  </div>
+  <div class="stats" aria-live="polite">
+    <div class="stat"><b id="s-done">0/100</b><span>판정 완료</span></div>
+    <div class="stat"><b id="s-acc">–</b><span>모델 일치율</span></div>
+    <div class="stat"><b id="s-null">–</b><span>'해당 없음' 판정 일치</span></div>
+  </div>
+</header>
+<div class="bar"><i id="bar"></i></div>
+
+<div class="wrap">
+  <aside class="rail">
+    <h2>조각 목록</h2>
+    <div class="grid" id="grid"></div>
+    <div class="legend">
+      <span><i style="background:var(--ok-soft);border-color:var(--ok)"></i>모델 일치</span>
+      <span><i style="background:var(--bad-soft);border-color:var(--bad)"></i>불일치</span>
+      <span><i style="background:var(--warn-soft);border-color:var(--warn)"></i>애매함</span>
+    </div>
+    <div class="filter" role="group" aria-label="보기 범위">
+      <button id="f-all" aria-pressed="true">전체</button>
+      <button id="f-todo" aria-pressed="false">미판정만</button>
+    </div>
+  </aside>
+
+  <main class="card" id="card">
+    <div class="meta">
+      <span class="n" id="m-n"></span><span id="m-date"></span><span id="m-id"></span>
+      <span class="title" id="m-title"></span>
+    </div>
+    <p class="excerpt" id="excerpt"></p>
+    <div class="model" id="model" hidden>
+      <span class="lbl">모델 판단</span><span id="m-pick"></span>
+      <span class="lbl">차순위</span><span id="m-alt"></span>
+    </div>
+    <p class="help" id="wait" aria-live="polite"></p>
+    <div class="actions">
+      <button class="btn" id="b-none">해당 없음<kbd>N</kbd></button>
+      <button class="btn" id="b-amb">애매함<kbd>A</kbd></button>
+    </div>
+    <div class="opts" id="opts"></div>
+    <label class="help" for="note">메모 (선택) — 틀린 이유, 겹치는 자산군 등</label>
+    <textarea id="note"></textarea>
+    <div id="judged"></div>
+    <div class="nav">
+      <button class="btn" id="b-prev">← 이전</button>
+      <span class="status" id="status">저장소 연결 중…</span>
+      <button class="btn" id="b-next">다음 →</button>
+    </div>
+    <p class="help">판정 기준: 이 조각이 <b>투자 관점에서 어느 자산군 이야기인지</b>입니다. 방송 진행 멘트·역사·사회·정치 일반처럼 자산과 무관하면 "해당 없음"입니다. 조각을 연 뒤 3초가 지나야 판정할 수 있고, 판정하면 모델 판단이 공개됩니다. 키보드: N 해당 없음, A 애매함, ←/→ 이동.</p>
+  </main>
+</div>
+
+<script type="application/json" id="data">__DATA__</script>
+<script>
+(function(){
+  const DATA = JSON.parse(document.getElementById('data').textContent);
+  const items = DATA.items, assets = DATA.assets;
+  const nameOf = Object.fromEntries(assets.map(a => [a.id, a.name]));
+  nameOf.NONE = '해당 없음';
+  const labels = {};           // itemId -> {label, ambiguous, note}
+  const COLL = 'labels2';      // 1차 검수(labels)는 키 반복 입력으로 무효 처리했다
+  const MIN_DWELL_MS = 3000;
+  let idx = 0, onlyTodo = false, db = null, saving = 0, shownAt = Date.now(), gateTimer = null;
+  function gateOpen(){ return !!labels[items[idx].id] || Date.now() - shownAt >= MIN_DWELL_MS; }
+  const $ = id => document.getElementById(id);
+  const docId = it => it.id.replace(/[^A-Za-z0-9_\-.~:@+]/g, '_');
+
+  function isOk(it, l){ return l && !l.ambiguous && l.label === it.model; }
+  function klass(it){
+    const l = labels[it.id]; if (!l) return '';
+    if (l.ambiguous) return 'done-amb';
+    return isOk(it, l) ? 'done-ok' : 'done-bad';
+  }
+
+  function renderGrid(){
+    const g = $('grid'); g.textContent = '';
+    items.forEach((it, i) => {
+      const b = document.createElement('button');
+      b.className = 'cell ' + klass(it) + (i === idx ? ' cur' : '');
+      b.textContent = it.n; b.title = it.title;
+      b.setAttribute('aria-label', it.n + '번 조각');
+      b.onclick = () => { idx = i; render(); };
+      g.appendChild(b);
+    });
+  }
+
+  function renderOpts(it){
+    const box = $('opts'); box.textContent = '';
+    const cur = labels[it.id];
+    const groups = [['ICB 슈퍼섹터', 'ICB'], ['원자재', 'COMMODITY']];
+    for (const [title, grp] of groups){
+      const h = document.createElement('h3'); h.textContent = '정답 자산군 고르기 · ' + title; box.appendChild(h);
+      const row = document.createElement('div'); row.className = 'optrow';
+      assets.filter(a => a.group === grp).forEach(a => {
+        const b = document.createElement('button'); b.className = 'opt'; b.textContent = a.name;
+        b.setAttribute('aria-pressed', String(!!cur && !cur.ambiguous && cur.label === a.id));
+        b.disabled = !gateOpen();
+        b.onclick = () => judge(a.id, false); row.appendChild(b);
+      });
+      box.appendChild(row);
+    }
+  }
+
+  let lastIdx = -1;
+  function render(){
+    const list = onlyTodo ? items.filter(it => !labels[it.id]) : items;
+    if (onlyTodo && list.length && !list.includes(items[idx])) idx = items.indexOf(list[0]);
+    const it = items[idx];
+    if (idx !== lastIdx){
+      lastIdx = idx; shownAt = Date.now(); clearTimeout(gateTimer);
+      if (!labels[it.id]) gateTimer = setTimeout(render, MIN_DWELL_MS + 20);
+    }
+    const open = gateOpen();
+    $('b-none').disabled = !open; $('b-amb').disabled = !open;
+    $('wait').textContent = open ? '' : '조각을 읽는 중… 3초 뒤 판정할 수 있습니다';
+    $('model').hidden = !labels[it.id];
+    $('m-n').textContent = '#' + it.n + ' / ' + items.length;
+    $('m-date').textContent = it.date.slice(0,4) + '-' + it.date.slice(4,6) + '-' + it.date.slice(6);
+    $('m-id').textContent = it.id;
+    $('m-title').textContent = it.title;
+    $('excerpt').textContent = it.text;
+    const pick = $('m-pick'); pick.textContent = '';
+    const c = document.createElement('span');
+    if (it.model === 'NONE'){
+      c.className = 'chip nullpick'; c.textContent = '해당 없음 (' + it.null_name + ')';
+      const s = document.createElement('small'); s.textContent = it.null_sim.toFixed(3) + ' > ' + it.sim1.toFixed(3); c.appendChild(s);
+    } else {
+      c.className = 'chip pick'; c.textContent = it.top1_name;
+      const s = document.createElement('small'); s.textContent = it.sim1.toFixed(3); c.appendChild(s);
+    }
+    pick.appendChild(c);
+    const alt = $('m-alt'); alt.textContent = '';
+    const a2 = document.createElement('span'); a2.className = 'chip';
+    a2.textContent = it.model === 'NONE' ? it.top1_name : it.top2_name;
+    const s2 = document.createElement('small'); s2.textContent = (it.model === 'NONE' ? it.sim1 : it.sim2).toFixed(3); a2.appendChild(s2);
+    alt.appendChild(a2);
+    renderOpts(it);
+    const l = labels[it.id];
+    $('note').value = l && l.note ? l.note : '';
+    const j = $('judged'); j.textContent = ''; j.className = '';
+    if (l){
+      j.className = 'judged ' + (l.ambiguous ? 'amb' : isOk(it, l) ? 'ok' : 'bad');
+      j.textContent = l.ambiguous ? '애매함으로 표시함' + (l.label ? ' (가장 가까운 답: ' + nameOf[l.label] + ')' : '')
+        : '판정: ' + nameOf[l.label] + (isOk(it, l) ? ' — 모델과 일치' : ' — 모델과 다름');
+    }
+    renderGrid(); renderStats();
+  }
+
+  function renderStats(){
+    const done = items.filter(it => labels[it.id]);
+    $('s-done').textContent = done.length + '/' + items.length;
+    $('bar').style.width = (done.length / items.length * 100) + '%';
+    const clear = done.filter(it => !labels[it.id].ambiguous);
+    $('s-acc').textContent = clear.length ? Math.round(clear.filter(it => isOk(it, labels[it.id])).length / clear.length * 100) + '%' : '–';
+    const nulls = clear.filter(it => it.model === 'NONE');
+    $('s-null').textContent = nulls.length ? Math.round(nulls.filter(it => labels[it.id].label === 'NONE').length / nulls.length * 100) + '%' : '–';
+  }
+
+  async function save(it){
+    const l = labels[it.id];
+    const body = {item: it.id, label: l.label || null, ambiguous: !!l.ambiguous, note: l.note || '',
+                  model: it.model, blind: true, dwellMs: l.dwellMs || null, updatedAt: new Date().toISOString()};
+    try { localStorage.setItem('p24-review-v2', JSON.stringify(labels)); } catch (e) {}
+    if (!db){ $('status').textContent = '이 브라우저에만 임시 저장됨 (저장소 연결 안 됨)'; return; }
+    saving++; $('status').textContent = '저장 중…';
+    try { await db.doc(COLL + '/' + docId(it)).set(body); $('status').textContent = '저장됨'; }
+    catch (e) { $('status').textContent = '저장 실패: ' + (e && e.code || '알 수 없음') + ' — 다시 판정해 주세요'; }
+    finally { saving--; }
+  }
+
+  function judge(label, ambiguous){
+    if (!gateOpen()) return;
+    const it = items[idx];
+    const prev = labels[it.id] || {};
+    labels[it.id] = {label: label, ambiguous: ambiguous, note: $('note').value.trim() || prev.note || '',
+                     dwellMs: prev.dwellMs || (Date.now() - shownAt)};
+    save(it);
+    render();   // 판정 후 모델 판단을 공개한다. 다음 조각으로는 직접 넘어간다.
+  }
+
+  $('b-none').onclick = () => judge('NONE', false);
+  $('b-amb').onclick = () => { const l = labels[items[idx].id]; judge(l && l.label || null, true); };
+  $('b-prev').onclick = () => { if (idx > 0){ idx--; render(); } };
+  $('b-next').onclick = () => { if (idx < items.length - 1){ idx++; render(); } };
+  let noteTimer = null;
+  $('note').addEventListener('input', () => {
+    const it = items[idx]; if (!labels[it.id]) return;
+    clearTimeout(noteTimer);
+    noteTimer = setTimeout(() => { labels[it.id].note = $('note').value.trim(); save(it); }, 800);
+  });
+  $('f-all').onclick = () => { onlyTodo = false; $('f-all').setAttribute('aria-pressed','true'); $('f-todo').setAttribute('aria-pressed','false'); render(); };
+  $('f-todo').onclick = () => { onlyTodo = true; $('f-todo').setAttribute('aria-pressed','true'); $('f-all').setAttribute('aria-pressed','false'); render(); };
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'TEXTAREA' || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.repeat) return;   // 키를 누르고 있어 생기는 반복 입력은 판정으로 받지 않는다
+    const k = e.key.toLowerCase();
+    if (k === 'n') $('b-none').click();
+    else if (k === 'a') $('b-amb').click();
+    else if (e.key === 'ArrowRight') $('b-next').click();
+    else if (e.key === 'ArrowLeft') $('b-prev').click();
+  });
+
+  try { Object.assign(labels, JSON.parse(localStorage.getItem('p24-review-v2') || '{}')); } catch (e) {}
+  render();
+
+  (window.claude ? window.claude.use('db') : Promise.resolve(null)).then(handle => {
+    db = handle;
+    if (!db){ $('status').textContent = '저장소를 쓸 수 없어 이 브라우저에만 임시 저장합니다'; return; }
+    $('status').textContent = '저장소 연결됨';
+    db.collection(COLL).onSnapshot(snap => {
+      if (saving) return;
+      snap.docs.forEach(d => { const v = d.data(); if (v && v.item) labels[v.item] = {label: v.label, ambiguous: v.ambiguous, note: v.note, dwellMs: v.dwellMs}; });
+      render();
+    }, err => { $('status').textContent = '저장소 동기화 중단: ' + err.code; });
+  }).catch(() => { $('status').textContent = '저장소를 쓸 수 없어 이 브라우저에만 임시 저장합니다'; });
+})();
+</script>
