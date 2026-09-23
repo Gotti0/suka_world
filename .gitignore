@@ -16,6 +16,7 @@ docs/WORKLOG.md
 
 # 검수 표본과 생성 페이지(자막 발췌 포함). 템플릿만 추적한다.
 review/*.json
+review/*.txt
 review/p24_review.html
 review/db_export/
 
