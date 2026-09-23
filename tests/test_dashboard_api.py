@@ -139,3 +139,29 @@ def test_index_html_endpoint(client):
     assert "assetDropdown" in html
     assert "apiFetch('/api/summary')" in html
     assert "apiFetch" in html
+    assert "3D 영상 군집" in html
+
+
+def test_api_3d_endpoint(client):
+    response = client.get("/api/3d")
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 1920
+    first = data[0]
+    assert "title" in first
+    assert "cluster_name" in first
+    assert "x" in first
+    assert "y" in first
+    assert "z" in first
+    assert "url" in first
+
+
+def test_view_3d_endpoint(client):
+    response = client.get("/3d")
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+    html = response.text
+    assert "Plotly" in html or "plotly" in html
+    assert "슈카월드" in html
+    assert "Scatter3d" in html or "scatter3d" in html

@@ -185,6 +185,25 @@ def get_assets() -> List[Dict[str, Any]]:
     return get_assets_data()
 
 
+@app.get("/api/3d")
+def get_3d_data() -> List[Dict[str, Any]]:
+    """Returns 3D semantic clustering coordinates and metadata for 1,920 videos."""
+    json_file = DATA_DIR / "syuka_videos_3d.json"
+    if not json_file.exists():
+        raise HTTPException(status_code=404, detail="syuka_videos_3d.json not found. Run scripts/cluster_and_visualize_3d.py first.")
+    with open(json_file, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+@app.get("/3d", response_class=HTMLResponse)
+def view_3d() -> str:
+    """Serves the standalone 3D interactive clustering map."""
+    html_file = BASE_DIR / "review" / "syuka_videos_3d.html"
+    if not html_file.exists():
+        raise HTTPException(status_code=404, detail="syuka_videos_3d.html not found")
+    return html_file.read_text(encoding="utf-8")
+
+
 @app.get("/api/signals/{asset_id}")
 def get_asset_signals(asset_id: str) -> Dict[str, Any]:
     """Returns the full 280-week timeline of weekly signals, prices, returns, and stances for a specific asset."""
@@ -567,9 +586,14 @@ def index() -> str:
                     "슈카 말만 듣고 투자했다면 2021~2026" | 280주 시계열 분석 (2021-04-30 ~ 2026-09-11) | 18,308건 자막 및 24개 자산군
                 </div>
             </div>
-            <div class="server-status">
-                <div class="pulse-dot"></div>
-                <span id="healthStatus">FastAPI Server Online (Port 8000)</span>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <a href="./3d.html" id="link3D" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; text-decoration: none; padding: 7px 16px; border-radius: 9999px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 12px rgba(99, 102, 241, 0.35); transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1.0'">
+                    🪐 3D 영상 군집 뷰어
+                </a>
+                <div class="server-status">
+                    <div class="pulse-dot"></div>
+                    <span id="healthStatus">FastAPI Server Online (Port 8000)</span>
+                </div>
             </div>
         </header>
 
@@ -801,6 +825,10 @@ def index() -> str:
                 const data = await res.json();
                 const serverName = IS_STATIC ? 'GitHub Pages (280 Weeks Live)' : `FastAPI Server Online (${data.total_weeks} Weeks Live)`;
                 document.getElementById('healthStatus').innerText = serverName;
+                if (!IS_STATIC) {
+                    const l3d = document.getElementById('link3D');
+                    if (l3d) l3d.href = '/3d';
+                }
             } catch (e) {
                 console.error('Health check failed', e);
                 document.getElementById('healthStatus').innerText = 'API Server Disconnected';

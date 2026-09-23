@@ -97,6 +97,16 @@ def export_static_site(out_dir: Path) -> None:
         exported_signals += 1
     print(f"  ✓ Created data/signals/*.json ({exported_signals} asset signals)")
 
+    # 8. 3D Cluster Visualizer & Data
+    html_3d = BASE_DIR / "review" / "syuka_videos_3d.html"
+    if html_3d.exists():
+        shutil.copy2(html_3d, out_dir / "3d.html")
+        print("  ✓ Created 3d.html")
+    data_3d = BASE_DIR / "data" / "syuka_videos_3d.json"
+    if data_3d.exists():
+        shutil.copy2(data_3d, data_dir / "syuka_videos_3d.json")
+        print("  ✓ Created data/syuka_videos_3d.json")
+
     total_files = sum(1 for _ in out_dir.rglob("*") if _.is_file())
     total_bytes = sum(_.stat().st_size for _ in out_dir.rglob("*") if _.is_file())
     print(f"🎉 Successfully exported {total_files} files ({total_bytes / 1024:.1f} KB total)")
