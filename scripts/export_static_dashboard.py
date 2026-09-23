@@ -33,7 +33,16 @@ from dashboard.app import (
 def export_static_site(out_dir: Path) -> None:
     print(f"📦 Exporting static dashboard to: {out_dir.resolve()}")
     if out_dir.exists():
-        shutil.rmtree(out_dir)
+        for item in out_dir.iterdir():
+            if item.name == ".git":
+                continue
+            if item.is_dir():
+                shutil.rmtree(item, ignore_errors=True)
+            else:
+                try:
+                    item.unlink()
+                except OSError:
+                    pass
     out_dir.mkdir(parents=True, exist_ok=True)
 
     data_dir = out_dir / "data"
@@ -98,21 +107,16 @@ def deploy_to_gh_pages(out_dir: Path, repo_url: str = "https://github.com/Gotti0
 
     print(f"🚀 Deploying {out_dir} to gh-pages branch on {repo_url}...")
     git_dir = out_dir / ".git"
-    if git_dir.exists():
-        shutil.rmtree(git_dir)
+    if not git_dir.exists():
+        subprocess.run(["git", "init"], cwd=out_dir, check=True)
+        subprocess.run(["git", "checkout", "-b", "gh-pages"], cwd=out_dir, check=True)
+        subprocess.run(["git", "remote", "add", "origin", repo_url], cwd=out_dir, check=True)
 
-    subprocess.run(["git", "init"], cwd=out_dir, check=True)
-    subprocess.run(["git", "checkout", "-b", "gh-pages"], cwd=out_dir, check=True)
     subprocess.run(["git", "add", "-A"], cwd=out_dir, check=True)
     subprocess.run(
-        ["git", "commit", "-m", "deploy: publish static dashboard on GitHub Pages"],
+        ["git", "commit", "-m", "deploy: update static dashboard on GitHub Pages (deduped concept calls)"],
         cwd=out_dir,
-        check=True,
-    )
-    subprocess.run(
-        ["git", "remote", "add", "origin", repo_url],
-        cwd=out_dir,
-        check=True,
+        check=False,
     )
     subprocess.run(
         ["git", "push", "-f", "origin", "gh-pages"],

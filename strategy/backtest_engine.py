@@ -281,26 +281,36 @@ class P24IntegratedBacktester:
 
 def extract_top_bottom_calls(panel_df: pd.DataFrame, top_k: int = 5) -> Dict:
     """누적 PnL 기여도가 가장 높았던 최고 적중 발언 Top 5 vs 최악 오판 발언 Top 5와
-    실제 자막 인용문(quote)을 매핑하여 추출합니다.
+    해당 주간 실제 방송된 자막 인용문(quote)을 매핑하여 추출합니다.
+    중복 에피소드 및 자산 도배를 방지하기 위해 고유 자산(Unique Asset) 기준으로 선별합니다.
     """
     parsed = pd.read_csv(PARSED_CSV)
     parsed["dt_str"] = pd.to_datetime(parsed["date"].astype(str), format="%Y%m%d").dt.strftime("%Y-%m-%d")
     
-    # GK 알파 PnL 기준 정렬
-    sorted_by_pnl = panel_df.sort_values(by="pnl_gk", ascending=False)
-    best_calls = sorted_by_pnl.head(top_k)
-    worst_calls = sorted_by_pnl.tail(top_k)
+    # GK 알파 PnL 기준 정렬 및 자산별 중복 제거 (다양한 레전드 에피소드 확보)
+    best_calls = panel_df.sort_values(by="pnl_gk", ascending=False).drop_duplicates(subset=["asset_id"]).head(top_k)
+    worst_calls = panel_df.sort_values(by="pnl_gk", ascending=True).drop_duplicates(subset=["asset_id"]).head(top_k)
     
     def enrich_call(row, is_best: bool):
         entry_date = row["entry_date"]
         asset = row["asset_id"]
         
-        # 해당 진입일 직전 4주 이내의 관련 영상 청크 검색
+        # 1차: 진입일 직전 28일 이내 방송된 영상 청크 검색
+        window_start = (pd.to_datetime(entry_date) - pd.Timedelta(days=28)).strftime("%Y-%m-%d")
         sub_chunks = parsed[
             (parsed["dt_str"] <= entry_date) &
+            (parsed["dt_str"] >= window_start) &
             (parsed["relevant"] == 1) &
             (parsed["asset_id"] == asset)
-        ].sort_values(by="confidence", ascending=False)
+        ].sort_values(by=["date", "confidence"], ascending=[False, False])
+        
+        # 2차 fallback: 28일 이내 없으면 과거 전체 중 최고 확신도 청크 검색
+        if sub_chunks.empty:
+            sub_chunks = parsed[
+                (parsed["dt_str"] <= entry_date) &
+                (parsed["relevant"] == 1) &
+                (parsed["asset_id"] == asset)
+            ].sort_values(by="confidence", ascending=False)
         
         best_quote = ""
         video_title = ""
@@ -309,9 +319,9 @@ def extract_top_bottom_calls(panel_df: pd.DataFrame, top_k: int = 5) -> Dict:
         
         if not sub_chunks.empty:
             top_chunk = sub_chunks.iloc[0]
-            best_quote = str(top_chunk.get("quote", ""))
-            video_title = str(top_chunk.get("title", ""))
-            video_id = str(top_chunk.get("video_id", ""))
+            best_quote = str(top_chunk.get("quote", "")).strip()
+            video_title = str(top_chunk.get("title", "")).strip()
+            video_id = str(top_chunk.get("video_id", "")).strip()
             confidence = float(top_chunk.get("confidence", 0.0))
             
         return {
