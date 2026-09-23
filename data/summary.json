@@ -83,26 +83,26 @@
       "information_ratio": 0.8216
     },
     "ret_meta_gross": {
-      "cumulative_return": -0.1597,
-      "cagr": -0.0318,
-      "annualized_volatility": 0.0436,
-      "sharpe_ratio": -0.7185,
-      "max_drawdown": -0.1997,
-      "calmar_ratio": -0.1592,
-      "win_rate": 0.4643,
-      "profit_factor": 0.7474,
-      "information_ratio": -1.0543
+      "cumulative_return": -0.2019,
+      "cagr": -0.041,
+      "annualized_volatility": 0.0457,
+      "sharpe_ratio": -0.8932,
+      "max_drawdown": -0.2378,
+      "calmar_ratio": -0.1725,
+      "win_rate": 0.4536,
+      "profit_factor": 0.696,
+      "information_ratio": -1.1072
     },
     "ret_meta_net": {
-      "cumulative_return": -0.2484,
-      "cagr": -0.0516,
-      "annualized_volatility": 0.0437,
-      "sharpe_ratio": -1.1917,
-      "max_drawdown": -0.2797,
-      "calmar_ratio": -0.1846,
-      "win_rate": 0.4393,
-      "profit_factor": 0.6144,
-      "information_ratio": -1.2116
+      "cumulative_return": -0.2873,
+      "cagr": -0.061,
+      "annualized_volatility": 0.0458,
+      "sharpe_ratio": -1.3501,
+      "max_drawdown": -0.3157,
+      "calmar_ratio": -0.1931,
+      "win_rate": 0.4357,
+      "profit_factor": 0.5753,
+      "information_ratio": -1.2639
     },
     "ret_regime_gross": {
       "cumulative_return": 1.688,
