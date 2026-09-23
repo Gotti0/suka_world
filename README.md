@@ -29,6 +29,11 @@ suka_world/
 ├── collector/             # 유튜브 자막, 증권사(CYBOS), DART 데이터 수집 모듈
 ├── nlp_engine/            # LLM(Gemini) 및 임베딩(Voyage AI) 처리 엔진
 ├── strategy/              # 트레이딩 로직, 자산 매핑, 백테스트 엔진
+├── dashboard/             # 분석 결과 조회용 대시보드 앱 (app.py)
+├── scripts/               # 3D 클러스터링, 정적 대시보드 내보내기 등 실행 스크립트
+├── review/                # 검수용 HTML 템플릿 및 리포트 페이지
+├── scratch/               # 일회성 점검·탐색용 스크립트 모음
+├── tests/                 # pytest 기반 파이프라인·백테스트 테스트
 ├── data/                  # 수집된 자막 JSON 파일 및 큐(Queue) 관리 폴더
 ├── docs/                  # 대량의 자막 원본 파일 보관 폴더
 ├── fill_missing_dates.py  # 자막 데이터 내 누락된 영상 업로드 일자 보완 스크립트
